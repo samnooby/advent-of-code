@@ -1,12 +1,14 @@
-import * as fs from "fs";
-import { Day, runDay } from "./days";
+import { Day } from "./day";
+import { getDayFromUserInput } from "./days";
 
-const testDay = (day: number, dayFunc: Day) => {
-  const input = fs.readFileSync(`./tests/day${day}.txt`).toString().split("\n");
-  const expected = fs.readFileSync(`./tests/answers/day${day}.txt`).toString();
-  const actual = dayFunc(input);
-  console.log(`Day ${day}: ${actual === expected ? "PASS" : "FAIL"}`);
-  console.log(`Got answer: ${actual}, expected: ${expected}`);
+const testDay = (day: Day) => {
+  console.log(`Day ${day.dayNumber} tests:`);
+  day.test().forEach((test, index) => {
+    console.log(`Test ${index + 1}: ${test.passed ? "Passed" : "Failed"}`);
+    console.log(
+      `Got: ${test.value} ${test.passed ? "" : `Expected: ${test.expected}`}`
+    );
+  });
 };
 
-runDay("test", testDay);
+getDayFromUserInput("test", testDay);

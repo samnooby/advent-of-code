@@ -1,13 +1,11 @@
-import * as fs from "fs";
-import { Day, runDay } from "./days";
+import { Day } from "./day";
+import { getDayFromUserInput } from "./days";
 
-const solveDay = (day: number, dayFunc: Day) => {
-  console.log(`Solving Day ${day}`);
-  const input = fs
-    .readFileSync(`./inputs/day${day}.txt`)
-    .toString()
-    .split("\n");
-  console.log(`Got answer: ${dayFunc(input)}`);
+const runDay = (day: Day) => {
+  console.log(`Day ${day.dayNumber} solutions:`);
+  day.run().forEach((solution, index) => {
+    console.log(`Part ${index + 1}: ${solution}`);
+  });
 };
 
-runDay("solve", solveDay);
+getDayFromUserInput("solve", runDay);
