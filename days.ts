@@ -1,7 +1,8 @@
 import { Day } from "./day";
+import { Day1 } from "./days/day1/day1";
 import * as readline from "readline";
 
-export const days: Day[] = [];
+export const days: Day[] = [Day1];
 
 export const getDayFromUserInput = (
   label: String,
@@ -12,7 +13,7 @@ export const getDayFromUserInput = (
     output: process.stdout,
   });
   rl.question(
-    `What day do you want to ${label}? (1-${days.length}, 'a' or 'all' for all)\n`,
+    `What day do you want to ${label}? (1-${days.length}, 'a' for all or blank for latest)\n`,
     (answer) => {
       if (!answer) {
         // If no answer callback with the latest day
