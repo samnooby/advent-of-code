@@ -12,7 +12,7 @@ export const getDayFromUserInput = (
     output: process.stdout,
   });
   rl.question(
-    `What day do you want to ${label}? (1-${days.length})\n`,
+    `What day do you want to ${label}? (1-${days.length}, 'a' or 'all' for all)\n`,
     (answer) => {
       if (!answer) {
         // If no answer callback with the latest day

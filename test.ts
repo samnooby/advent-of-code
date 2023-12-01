@@ -2,7 +2,7 @@ import { Day, TestResult } from "./day";
 import { getDayFromUserInput } from "./days";
 
 const testDay = (day: Day) => {
-  console.log(`Day ${day.dayNumber} tests:`);
+  console.log(`\nDay ${day.dayNumber} tests:`);
   const tests: { [key: string]: TestResult } = {};
   day.test().forEach((test, index) => {
     tests[`Part ${index + 1}`] = test;
