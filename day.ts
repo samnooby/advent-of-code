@@ -8,6 +8,12 @@ export type Test = {
   solution: Solution;
 };
 
+export type TestResult = {
+  passed: Boolean;
+  value: string;
+  expected: string;
+};
+
 export type Solutions = {
   file: string;
   solution: Solution;
@@ -21,14 +27,14 @@ export abstract class Day {
   run(): string[] {
     return this.solutions.map(({ file, solution }) => {
       const input = fs
-        .readFileSync(`'./days/day${this.dayNumber}/${file}`)
+        .readFileSync(`./days/day${this.dayNumber}/${file}`)
         .toString()
         .split("\n");
       return solution(input);
     });
   }
 
-  test(): { passed: Boolean; value: string; expected: string }[] {
+  test(): TestResult[] {
     return this.tests.map(({ file, expected, solution }) => {
       const input = fs
         .readFileSync(`./days/day${this.dayNumber}/${file}`)

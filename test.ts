@@ -1,14 +1,13 @@
-import { Day } from "./day";
+import { Day, TestResult } from "./day";
 import { getDayFromUserInput } from "./days";
 
 const testDay = (day: Day) => {
   console.log(`Day ${day.dayNumber} tests:`);
+  const tests: { [key: string]: TestResult } = {};
   day.test().forEach((test, index) => {
-    console.log(`Test ${index + 1}: ${test.passed ? "Passed" : "Failed"}`);
-    console.log(
-      `Got: ${test.value} ${test.passed ? "" : `Expected: ${test.expected}`}`
-    );
+    tests[`Part ${index + 1}`] = test;
   });
+  console.table(tests);
 };
 
 getDayFromUserInput("test", testDay);
