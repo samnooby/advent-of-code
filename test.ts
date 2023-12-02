@@ -1,5 +1,5 @@
-import { Day, TestResult } from "./day";
-import { getDayFromUserInput } from "./days";
+import { Day, TestResult } from "./days/day";
+import { getDayFromUserInput } from "./days/days";
 
 const testDay = (day: Day) => {
   console.log(`\nDay ${day.dayNumber} tests:`);

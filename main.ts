@@ -1,5 +1,5 @@
-import { Day } from "./day";
-import { getDayFromUserInput } from "./days";
+import { Day } from "./days/day";
+import { getDayFromUserInput } from "./days/days";
 
 const runDay = (day: Day) => {
   console.log(`\nDay ${day.dayNumber} solutions:`);

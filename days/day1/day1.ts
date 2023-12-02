@@ -1,4 +1,4 @@
-import { Day, Solution, Solutions, Test } from "../../day";
+import { Day, Solution, Solutions, Test } from "../day";
 
 class Day1Solution extends Day {
   private solvePart1: Solution = (input) => {
