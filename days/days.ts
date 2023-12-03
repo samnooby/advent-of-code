@@ -2,8 +2,9 @@ import { Day } from "./day";
 import * as readline from "readline";
 import { Day2 } from "./day2/day2";
 import { Day1 } from "./day1/day1";
+import { Day3 } from "./day3/day3";
 
-export const days: Day[] = [Day1, Day2];
+export const days: Day[] = [Day1, Day2, Day3];
 
 export const getDayFromUserInput = (
   label: String,
