@@ -1,19 +1,7 @@
 import { Day, Solution } from "../day";
-
-interface CardWins {
-  [key: number]: number;
-}
-
 interface ScratchCards {
   [key: number]: ScratchCard;
 }
-
-// interface ScratchCard {
-//   cardNumber: number;
-//   winning: number[];
-//   playing: number[];
-//   multiple?: number;
-// }
 
 type ScratchCard = {
   cardNumber: number;
@@ -61,14 +49,14 @@ class Day4Solution extends Day {
     return `${total}`;
   };
 
+  private scratchCards: ScratchCards = {};
+
   private getNumWins(card: ScratchCard): number {
     return card.playing.reduce((prev, curr) => {
       if (card.winning.includes(curr)) return prev + 1;
       return prev;
     }, 0);
   }
-
-  scratchCards: ScratchCards = {};
 
   private solveCardWins(card: ScratchCard): number {
     const wins = this.getNumWins(card);
