@@ -1,4 +1,4 @@
-import { Day, Solution } from "../day";
+import { Day } from "../day";
 
 type Point = {
   x: number;
@@ -12,8 +12,49 @@ type FoundNumber = {
   row: number;
 };
 
-class Day3Solution extends Day {
+class Day3Solution extends Day<number> {
   dayNumber = 3;
+  expectedTestValues = { part1: 4361, part2: 467835 };
+
+  solvePart1(input: string[]) {
+    const numbers: FoundNumber[] = input.reduce(
+      (prev: FoundNumber[], curr, i) => {
+        return [...prev, ...this.findNumbers(curr, i)];
+      },
+      []
+    );
+    const solution = this.addValidNumbers(input, numbers);
+    return solution;
+  }
+
+  solvePart2(input: string[]) {
+    // Get all gears and numbers
+    const gears: Point[] = input.reduce((prev: Point[], curr, i) => {
+      return [...prev, ...this.findGears(curr, i)];
+    }, []);
+    const numbers: FoundNumber[] = input.reduce(
+      (prev: FoundNumber[], curr, i) => {
+        return [...prev, ...this.findNumbers(curr, i)];
+      },
+      []
+    );
+    const total = gears.reduce((prev: number, gear) => {
+      // Find numbers within range of the gear
+      const { x, y } = gear;
+      const nearbyNumbers = numbers.filter(({ start, end, row }) => {
+        return start - 1 <= x && x <= end && row - 1 <= y && y <= row + 1;
+      });
+      // If 2+ numbers nearby, add the product of the values to the total
+      if (nearbyNumbers.length > 1) {
+        const gearRatio = nearbyNumbers.reduce((prev: number, curr) => {
+          return prev * curr.value;
+        }, 1);
+        return prev + gearRatio;
+      }
+      return prev;
+    }, 0);
+    return total;
+  }
 
   // findNumbers returns a list of FoundNumbers containing all the numbers from the input string
   private findNumbers(input: String, row: number): FoundNumber[] {
@@ -63,17 +104,6 @@ class Day3Solution extends Day {
     }, 0);
   }
 
-  private solvePart1: Solution = (input) => {
-    const numbers: FoundNumber[] = input.reduce(
-      (prev: FoundNumber[], curr, i) => {
-        return [...prev, ...this.findNumbers(curr, i)];
-      },
-      []
-    );
-    const solution = this.addValidNumbers(input, numbers);
-    return `${solution}`;
-  };
-
   private findGears(input: String, row: number): Point[] {
     const regex = /(\*)/g;
     const matches = [...input.matchAll(regex)];
@@ -85,44 +115,6 @@ class Day3Solution extends Day {
       };
     });
   }
-
-  private solvePart2: Solution = (input) => {
-    // Get all gears and numbers
-    const gears: Point[] = input.reduce((prev: Point[], curr, i) => {
-      return [...prev, ...this.findGears(curr, i)];
-    }, []);
-    const numbers: FoundNumber[] = input.reduce(
-      (prev: FoundNumber[], curr, i) => {
-        return [...prev, ...this.findNumbers(curr, i)];
-      },
-      []
-    );
-    const total = gears.reduce((prev: number, gear) => {
-      // Find numbers within range of the gear
-      const { x, y } = gear;
-      const nearbyNumbers = numbers.filter(({ start, end, row }) => {
-        return start - 1 <= x && x <= end && row - 1 <= y && y <= row + 1;
-      });
-      // If 2+ numbers nearby, add the product of the values to the total
-      if (nearbyNumbers.length > 1) {
-        const gearRatio = nearbyNumbers.reduce((prev: number, curr) => {
-          return prev * curr.value;
-        }, 1);
-        return prev + gearRatio;
-      }
-      return prev;
-    }, 0);
-    return `${total}`;
-  };
-
-  tests = [
-    { file: "test.txt", expected: "4361", solution: this.solvePart1 },
-    { file: "test.txt", expected: "467835", solution: this.solvePart2 },
-  ];
-  solutions = [
-    { file: "input.txt", solution: this.solvePart1 },
-    { file: "input.txt", solution: this.solvePart2 },
-  ];
 }
 
 const Day3 = new Day3Solution();

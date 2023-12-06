@@ -7,11 +7,11 @@ import { Day4 } from "./day4/day4";
 import { Day5 } from "./day5/day5";
 import { Day6 } from "./day6/day6";
 
-export const days: Day[] = [Day1, Day2, Day3, Day4, Day5, Day6];
+export const days: Day<any>[] = [Day1, Day2, Day3, Day4, Day5, Day6];
 
 export const getDayFromUserInput = (
   label: String,
-  callback: (day: Day) => void
+  callback: (day: Day<any>) => void
 ) => {
   const rl = readline.createInterface({
     input: process.stdin,

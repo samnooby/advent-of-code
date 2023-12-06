@@ -3,11 +3,7 @@ import { getDayFromUserInput } from "./days/days";
 
 const testDay = (day: Day) => {
   console.log(`\nDay ${day.dayNumber} tests:`);
-  const tests: { [key: string]: TestResult } = {};
-  day.test().forEach((test, index) => {
-    tests[`Part ${index + 1}`] = test;
-  });
-  console.table(tests);
+  console.table(day.test());
 };
 
 getDayFromUserInput("test", testDay);

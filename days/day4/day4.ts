@@ -1,4 +1,4 @@
-import { Day, Solution } from "../day";
+import { Day } from "../day";
 interface ScratchCards {
   [key: number]: ScratchCard;
 }
@@ -10,8 +10,28 @@ type ScratchCard = {
   multiple: number;
 };
 
-class Day4Solution extends Day {
+class Day4Solution extends Day<number> {
   dayNumber = 4;
+  expectedTestValues = { part1: 13, part2: 30 };
+
+  solvePart1(input: string[]) {
+    const total = input.reduce((prev, curr) => {
+      return prev + this.getPoints(curr);
+    }, 0);
+
+    return total;
+  }
+
+  solvePart2(input: string[]) {
+    this.scratchCards = input.reduce((prev, curr) => {
+      const newCard = this.getNumbers(curr);
+      return { ...prev, [newCard.cardNumber]: newCard };
+    }, {});
+    const total = Object.values(this.scratchCards).reduce((prev, card) => {
+      return prev + this.solveCardWins(card);
+    }, 0);
+    return total;
+  }
 
   private getNumbers(card: String): ScratchCard {
     const numRegex = /(\d+)/g;
@@ -41,14 +61,6 @@ class Day4Solution extends Day {
     return total;
   }
 
-  private solvePart1: Solution = (input) => {
-    const total = input.reduce((prev, curr) => {
-      return prev + this.getPoints(curr);
-    }, 0);
-
-    return `${total}`;
-  };
-
   private scratchCards: ScratchCards = {};
 
   private getNumWins(card: ScratchCard): number {
@@ -69,26 +81,6 @@ class Day4Solution extends Day {
 
     return card.multiple;
   }
-
-  private solvePart2: Solution = (input) => {
-    this.scratchCards = input.reduce((prev, curr) => {
-      const newCard = this.getNumbers(curr);
-      return { ...prev, [newCard.cardNumber]: newCard };
-    }, {});
-    const total = Object.values(this.scratchCards).reduce((prev, card) => {
-      return prev + this.solveCardWins(card);
-    }, 0);
-    return `${total}`;
-  };
-
-  tests = [
-    { file: "test.txt", expected: "13", solution: this.solvePart1 },
-    { file: "test.txt", expected: "30", solution: this.solvePart2 },
-  ];
-  solutions = [
-    { file: "input.txt", solution: this.solvePart1 },
-    { file: "input.txt", solution: this.solvePart2 },
-  ];
 }
 
 const Day4 = new Day4Solution();

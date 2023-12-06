@@ -1,4 +1,4 @@
-import { Day, Solution, Solutions, Test } from "../day";
+import { Day } from "../day";
 
 type NumberMap = {
   destination: number;
@@ -15,8 +15,51 @@ type SeedRange = {
   range: number;
 };
 
-class Day5Solution extends Day {
+class Day5Solution extends Day<number> {
   dayNumber = 5;
+  expectedTestValues = { part1: 35, part2: 46 };
+
+  solvePart1(input: string[]) {
+    // Get the seeds
+    const seeds = this.getSeeds(input[0]);
+    const maps = this.getMaps(input);
+    let min: number | null = null;
+    for (const seed of seeds) {
+      let mappedSeed = seed;
+      for (const seedMaps of Object.values(maps)) {
+        let oldSeed = mappedSeed;
+        for (const seedMap of seedMaps) {
+          if (oldSeed === mappedSeed) {
+            mappedSeed = this.mapNumber(mappedSeed, seedMap);
+          }
+        }
+      }
+      if (!min || mappedSeed < min) min = mappedSeed;
+    }
+    if (!min) throw Error("No min found");
+    return min;
+  }
+
+  solvePart2(input: string[]) {
+    let seedRanges = this.getSeedRanges(input[0]);
+    const numberMaps = this.getMaps(input);
+    for (const [key, maps] of Object.entries(numberMaps)) {
+      let leftoverSeeds = seedRanges;
+      let mappedSeeds: SeedRange[] = [];
+      for (const map of maps) {
+        let remainder: SeedRange[] = [];
+        for (const seed of leftoverSeeds) {
+          const { mapped, leftover } = this.getMappedRanges(seed, map);
+          if (leftover) remainder = [...remainder, leftover];
+          if (mapped) mappedSeeds = [...mappedSeeds, mapped];
+        }
+        leftoverSeeds = remainder;
+      }
+      seedRanges = [...leftoverSeeds, ...mappedSeeds];
+    }
+    const starts = seedRanges.map((s) => s.start);
+    return Math.min(...starts);
+  }
 
   // Gets all the seed numbers from the given string
   private getSeeds(input: string): number[] {
@@ -62,26 +105,6 @@ class Day5Solution extends Day {
     }, {});
     return maps;
   }
-
-  private solvePart1: Solution = (input) => {
-    // Get the seeds
-    const seeds = this.getSeeds(input[0]);
-    const maps = this.getMaps(input);
-    let min;
-    for (const seed of seeds) {
-      let mappedSeed = seed;
-      for (const seedMaps of Object.values(maps)) {
-        let oldSeed = mappedSeed;
-        for (const seedMap of seedMaps) {
-          if (oldSeed === mappedSeed) {
-            mappedSeed = this.mapNumber(mappedSeed, seedMap);
-          }
-        }
-      }
-      if (!min || mappedSeed < min) min = mappedSeed;
-    }
-    return `${min}`;
-  };
 
   private getSeedRanges(input: string): SeedRange[] {
     let seeds: SeedRange[] = [];
@@ -143,36 +166,6 @@ class Day5Solution extends Day {
       leftover: { start: rangeTop, range: topDifference },
     };
   }
-
-  private solvePart2: Solution = (input) => {
-    let seedRanges = this.getSeedRanges(input[0]);
-    const numberMaps = this.getMaps(input);
-    for (const [key, maps] of Object.entries(numberMaps)) {
-      let leftoverSeeds = seedRanges;
-      let mappedSeeds: SeedRange[] = [];
-      for (const map of maps) {
-        let remainder: SeedRange[] = [];
-        for (const seed of leftoverSeeds) {
-          const { mapped, leftover } = this.getMappedRanges(seed, map);
-          if (leftover) remainder = [...remainder, leftover];
-          if (mapped) mappedSeeds = [...mappedSeeds, mapped];
-        }
-        leftoverSeeds = remainder;
-      }
-      seedRanges = [...leftoverSeeds, ...mappedSeeds];
-    }
-    const starts = seedRanges.map((s) => s.start);
-    return `${Math.min(...starts)}`;
-  };
-
-  tests = [
-    { file: "test.txt", expected: "35", solution: this.solvePart1 },
-    { file: "test.txt", expected: "46", solution: this.solvePart2 },
-  ];
-  solutions = [
-    { file: "input.txt", solution: this.solvePart1 },
-    { file: "input.txt", solution: this.solvePart2 },
-  ];
 }
 
 const Day5 = new Day5Solution();
