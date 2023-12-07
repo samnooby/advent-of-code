@@ -1,7 +1,6 @@
 import { Day } from "../day";
 
 class Day1Solution extends Day {
-  dayNumber: number = 1;
   expectedTestValues = { part1: 142, part2: 281 };
   testFiles = { part1: "test1.txt", part2: "test2.txt" };
 
