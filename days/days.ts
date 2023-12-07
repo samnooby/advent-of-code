@@ -1,14 +1,21 @@
 import { Day } from "./day";
-import * as readline from "readline";
 import { readdirSync } from "fs";
+import { createDay } from "./dayCreator";
+import { createInterface } from "readline/promises";
 
+/**
+ * Imports all day files that follow the pattern './days/day${dayNumber}/day${dayNumber}.ts'
+ * and creates an object with dayNumber as the key and the imported file as the value.
+ *
+ * @returns An object containing all imported day files, with dayNumber as the key.
+ */
 const getDays = (): { [key: number]: Day<any, any> } => {
   const regex = /^day(\d+).ts$/;
   const files = readdirSync("./days", { recursive: true, withFileTypes: true });
   const foundDays: { [key: number]: Day<any, any> } = files.reduce(
     (prev, file) => {
       const dayNumber = regex.exec(file.name)?.at(1);
-      if (!dayNumber) {
+      if (!dayNumber || file.path !== `days/day${dayNumber}`) {
         return prev;
       }
       const day: Day<any, any> = require(`${file.path.replace("days/", "./")}/${
@@ -18,14 +25,16 @@ const getDays = (): { [key: number]: Day<any, any> } => {
     },
     {}
   );
-  if (Object.keys(foundDays).length === 0) {
-    throw Error("No days found");
-  }
 
   return foundDays;
 };
 
 const days: { [key: number]: Day<any, any> } = getDays();
+//If the current date is between December 1 and December 25, and the day doesn't already exist, create it
+const month = new Date().getMonth();
+const date = new Date().getDate();
+if (!days[date] && month === 11 && date <= 25) days[date] = createDay(date);
+
 const dayNumbers = Object.keys(days).map((key) => +key);
 
 /**

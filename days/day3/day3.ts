@@ -13,7 +13,6 @@ type FoundNumber = {
 };
 
 class Day3Solution extends Day {
-  dayNumber = 3;
   expectedTestValues = { part1: 4361, part2: 467835 };
 
   solvePart1(input: string[]) {

@@ -12,8 +12,6 @@ type Parts<P1, P2 = P1> = {
 };
 
 export abstract class Day<P1 = number, P2 = P1> {
-  abstract dayNumber: number;
-
   testFiles: Parts<string> = {
     part1: "test.txt",
     part2: "test.txt",
@@ -28,24 +26,39 @@ export abstract class Day<P1 = number, P2 = P1> {
   abstract solvePart1(input: string[]): P1;
   abstract solvePart2(input: string[]): P2;
 
-  private convertInputToString = (file: string): string[] => {
-    return readFileSync(`./days/day${this.dayNumber}/${file}`)
+  private convertInputToString = (
+    file: string,
+    dayNumber: number
+  ): string[] => {
+    return readFileSync(`./days/day${dayNumber}/${file}`)
       .toString()
       .split("\n");
   };
 
-  run(): Parts<P1, P2> {
-    const part1Input = this.convertInputToString(this.solutionFiles.part1);
-    const part2Input = this.convertInputToString(this.solutionFiles.part2);
+  run(dayNumber: number): Parts<P1, P2> {
+    const part1Input = this.convertInputToString(
+      this.solutionFiles.part1,
+      dayNumber
+    );
+    const part2Input = this.convertInputToString(
+      this.solutionFiles.part2,
+      dayNumber
+    );
     return {
       part1: this.solvePart1(part1Input),
       part2: this.solvePart2(part2Input),
     };
   }
 
-  test(): Parts<TestResult<P1>, TestResult<P2>> {
-    const part1Input = this.convertInputToString(this.testFiles.part1);
-    const part2Input = this.convertInputToString(this.testFiles.part2);
+  test(dayNumber: number): Parts<TestResult<P1>, TestResult<P2>> {
+    const part1Input = this.convertInputToString(
+      this.testFiles.part1,
+      dayNumber
+    );
+    const part2Input = this.convertInputToString(
+      this.testFiles.part2,
+      dayNumber
+    );
     const part1Value = this.solvePart1(part1Input);
     const part2Value = this.solvePart2(part2Input);
     return {

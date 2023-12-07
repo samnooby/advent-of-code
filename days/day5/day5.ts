@@ -16,7 +16,6 @@ type SeedRange = {
 };
 
 class Day5Solution extends Day {
-  dayNumber = 5;
   expectedTestValues = { part1: 35, part2: 46 };
 
   solvePart1(input: string[]) {

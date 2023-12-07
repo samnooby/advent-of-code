@@ -14,8 +14,7 @@ type Hand = {
   score: number;
 };
 
-class Day7Solution extends Day<number> {
-  dayNumber = 7;
+class Day7Solution extends Day {
   expectedTestValues = { part1: 6440, part2: 5905 };
 
   private compareTie = (a: Hand, b: Hand, wildCard: string = ""): number => {

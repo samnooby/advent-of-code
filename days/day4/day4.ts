@@ -11,7 +11,6 @@ type ScratchCard = {
 };
 
 class Day4Solution extends Day {
-  dayNumber = 4;
   expectedTestValues = { part1: 13, part2: 30 };
 
   solvePart1(input: string[]) {
