@@ -1,14 +1,22 @@
 import { Day } from "./day";
 import * as readline from "readline";
-import { Day2 } from "./day2/day2";
-import { Day1 } from "./day1/day1";
-import { Day3 } from "./day3/day3";
-import { Day4 } from "./day4/day4";
-import { Day5 } from "./day5/day5";
-import { Day6 } from "./day6/day6";
-import { Day7 } from "./day7/day7";
+import { readdirSync } from "fs";
 
-export const days: Day<any>[] = [Day1, Day2, Day3, Day4, Day5, Day6, Day7];
+const getDays = (): Day<any, any>[] => {
+  const regex = /day\d+.ts/;
+  const files = readdirSync("./days", { recursive: true, withFileTypes: true });
+  const foundDays: Day<any, any>[] = files
+    .filter((file) => {
+      return file.isFile() && regex.test(file.name);
+    })
+    .map((file) => require(`${file.path.replace("days/", "./")}/${file.name}`));
+  if (foundDays.length === 0) {
+    throw Error("No days found");
+  }
+  return foundDays;
+};
+
+const days: Day<any, any>[] = getDays();
 
 export const getDayFromUserInput = (
   label: String,

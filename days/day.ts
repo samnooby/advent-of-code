@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { readFileSync } from "fs";
 
 export type TestResult<R> = {
   passed: Boolean;
@@ -29,8 +29,7 @@ export abstract class Day<P1 = number, P2 = P1> {
   abstract solvePart2(input: string[]): P2;
 
   private convertInputToString = (file: string): string[] => {
-    return fs
-      .readFileSync(`./days/day${this.dayNumber}/${file}`)
+    return readFileSync(`./days/day${this.dayNumber}/${file}`)
       .toString()
       .split("\n");
   };

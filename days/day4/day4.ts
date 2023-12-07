@@ -83,5 +83,4 @@ class Day4Solution extends Day {
   }
 }
 
-const Day4 = new Day4Solution();
-export { Day4 };
+module.exports = new Day4Solution();
