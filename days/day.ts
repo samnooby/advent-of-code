@@ -11,7 +11,7 @@ type Parts<P1, P2 = P1> = {
   part2: P2;
 };
 
-export abstract class Day<P1 = string, P2 = P1> {
+export abstract class Day<P1 = number, P2 = P1> {
   abstract dayNumber: number;
 
   testFiles: Parts<string> = {

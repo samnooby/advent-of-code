@@ -4,7 +4,7 @@ const MAX_RED = 12;
 const MAX_GREEN = 13;
 const MAX_BLUE = 14;
 
-class Day2Solution extends Day<number> {
+class Day2Solution extends Day {
   dayNumber: number = 2;
   expectedTestValues = { part1: 8, part2: 2286 };
 

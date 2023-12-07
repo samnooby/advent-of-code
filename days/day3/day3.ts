@@ -12,7 +12,7 @@ type FoundNumber = {
   row: number;
 };
 
-class Day3Solution extends Day<number> {
+class Day3Solution extends Day {
   dayNumber = 3;
   expectedTestValues = { part1: 4361, part2: 467835 };
 

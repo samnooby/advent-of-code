@@ -1,6 +1,6 @@
 import { Day } from "../day";
 
-class Day6Solution extends Day<number> {
+class Day6Solution extends Day {
   dayNumber: number = 6;
   expectedTestValues = { part1: 288, part2: 71503 };
 

@@ -15,7 +15,7 @@ type SeedRange = {
   range: number;
 };
 
-class Day5Solution extends Day<number> {
+class Day5Solution extends Day {
   dayNumber = 5;
   expectedTestValues = { part1: 35, part2: 46 };
 
