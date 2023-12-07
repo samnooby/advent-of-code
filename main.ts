@@ -1,9 +1,8 @@
-import { Day } from "./days/day";
 import { getDayFromUserInput } from "./days/days";
 
-const runDay = (day: Day) => {
-  console.log(`\nDay ${day.dayNumber} solutions:`);
-  console.table(day.run());
-};
-
-getDayFromUserInput("solve", runDay);
+getDayFromUserInput("solve").then((days) => {
+  const solutions = Object.entries(days).reduce((prev, [dayNumber, day]) => {
+    return { ...prev, [dayNumber]: day.run(+dayNumber) };
+  }, {});
+  console.table(solutions);
+});
