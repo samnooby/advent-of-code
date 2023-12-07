@@ -23,6 +23,7 @@ const getDayTemplate = (dayNumber: number) => {
 const makeFileIfNotExists = (fileName: string, data: string = "") => {
   if (!existsSync(fileName)) {
     writeFileSync(fileName, data);
+    console.log(`Created file: ${fileName}`);
   }
 };
 
@@ -38,6 +39,7 @@ export const createDay = (dayNumber: number): Day<any, any> => {
   const dirName = `./days/day${dayNumber}`;
   if (!existsSync(dirName)) {
     mkdirSync(dirName);
+    console.log(`Create dir: ${dirName}`);
   }
   makeFileIfNotExists(
     `${dirName}/day${dayNumber}.ts`,
@@ -45,6 +47,5 @@ export const createDay = (dayNumber: number): Day<any, any> => {
   );
   makeFileIfNotExists(`${dirName}/input.txt`);
   makeFileIfNotExists(`${dirName}/test.txt`);
-  console.log(`Created new day ${dirName}/day${dayNumber}.ts`);
   return require(`./day${dayNumber}/day${dayNumber}.ts`);
 };
