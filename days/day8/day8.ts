@@ -12,6 +12,12 @@ type Node = {
 
 type Nodes = { [key: string]: Node };
 
+type NodeCache = {
+  [key: number]: {
+    [key: string]: { distanceToEnd: number; end: string };
+  };
+};
+
 class Day8Solution extends Day {
   expectedTestValues = { part1: 2, part2: 6 };
   testFiles = { part1: "test.txt", part2: "test2.txt" };
@@ -40,72 +46,104 @@ class Day8Solution extends Day {
     return step;
   }
 
-  private cache: { [key: string]: { distance: number; end: string } } = {};
+  private cache: NodeCache = {};
+  private nodes: Nodes = {};
+  private directions: string = "";
 
-  async getPathToEnd(
-    initalPath: string,
-    initalStep: number,
-    nodes: Nodes,
-    directions: string
-  ): Promise<[string, number]> {
-    let path = initalPath;
-    let step = initalStep;
-    let tmpCache: { [key: string]: number } = {};
-    const transferCache = () => {
-      Object.entries(tmpCache).forEach(([tmpKey, tmpVal]) => {
-        this.cache[tmpKey] = {
-          distance: step - tmpVal,
-          end: path,
-        };
-      });
-    };
-
+  followPath(
+    path: string,
+    initialStep: number
+  ): { path: string; step: number } {
+    let initalPath = path;
+    let step = initialStep;
+    const tmpCache: { path: string; step: number }[] = [];
     do {
-      const cacheKey = `${path}${step % directions.length}`;
-      console.log("Found cache value", cacheKey);
-      if (this.cache[cacheKey]) {
-        if (!cacheKey.endsWith("0")) {
-          console.log("Found cache value in cache", cacheKey);
-        }
-        step = step + this.cache[cacheKey].distance;
-        transferCache();
-        return [this.cache[cacheKey].end, step];
+      // If current value is cached use the cached value
+      const nextDirection = step % this.directions.length;
+      if (this.cache[nextDirection]?.[path]) {
+        step += this.cache[nextDirection][path].distanceToEnd;
+        path = this.cache[nextDirection][path].end;
+      } else {
+        // Add the new item to the temperary cache and get the next step in the path
+        tmpCache.push({ path, step: step });
+        const nextStep =
+          this.directions[nextDirection] === RIGHT ? "right" : "left";
+        path = this.nodes[path][nextStep];
+        step++;
       }
-      tmpCache[cacheKey] = step;
-      const direction =
-        directions[step % directions.length] === RIGHT ? "right" : "left";
-      path = nodes[path][direction];
-      step++;
     } while (!path.endsWith("Z"));
-    transferCache();
-
-    return [path, step];
+    // Once a ending is found update the main cache and return the ending
+    tmpCache.forEach((val) => {
+      const cacheKey = val.step % this.directions.length;
+      if (!this.cache[cacheKey]) {
+        this.cache[cacheKey] = {};
+      }
+      this.cache[cacheKey] = {
+        ...this.cache[cacheKey],
+        [val.path]: { distanceToEnd: step - val.step, end: path },
+      };
+    });
+    if (path != initalPath) {
+      console.log("Got different path", path, initalPath);
+    }
+    return { path, step };
   }
 
   async solvePart2(input: string[]): Promise<number> {
-    const directions = input[0];
-    const nodes = this.getNodes(input.slice(2));
-    const trackPath = (path: string, step: number) =>
-      this.getPathToEnd(path, step, nodes, directions);
-    // Get all the paths to the end
-    let paths: [string, number][] = await Promise.all(
-      Object.keys(nodes)
-        .filter((node) => node.endsWith("A"))
-        .map((start) => trackPath(start, 0))
-    );
-    // While all paths don't have the same length
-    let steps = paths.map((path) => path[1]);
-    while (!steps.every((s) => s === steps[0])) {
-      const longestPath = Math.max(...steps);
-      paths = await Promise.all(
-        paths.map((path) =>
-          path[1] === longestPath ? path : trackPath(path[0], path[1])
-        )
+    this.directions = input[0];
+    this.nodes = this.getNodes(input.slice(2));
+    const distanceBetweenEnds: {
+      [key: number]: { [key: string]: { path: string; step: number } };
+    } = {};
+    // Go through all the ending at every spot in the directions and find out how long it will take to get to each other ending
+    const ends = Object.keys(this.nodes).filter((path) => path.endsWith("Z"));
+    for (let i = 0; i < this.directions.length; i++) {
+      const paths = ends.reduce(
+        (prev, path) => ({ ...prev, [path]: this.followPath(path, i) }),
+        {}
       );
-      steps = paths.map((path) => path[1]);
+      distanceBetweenEnds[i] = paths;
     }
-    // console.log("Cache ", this.cache);
-    return steps[0];
+    // Find the starts and get them to their first ends, sort the list after to match the ends array (Order doesn't matter steps tracked)
+    let paths = Object.keys(this.nodes)
+      .filter((path) => path.endsWith("A"))
+      .map((path) => this.followPath(path, 0))
+      .sort((a, b) => (a.path < b.path ? -1 : 1));
+    let maxSteps = Math.max(...paths.map((path) => path.step));
+    let allMax = false;
+    console.log(
+      "Got start",
+      paths,
+      "max step",
+      maxSteps,
+      "and ends",
+      ends,
+      distanceBetweenEnds
+    );
+    let count = 0;
+    // while (!allMax) {
+    //   if (count > 4) return 0;
+    //   allMax = true;
+    //   for (let i = 0; i < paths.length; i++) {
+    //     console.log("Checking path", paths[i]);
+    //     while (paths[i].step < maxSteps) {
+    //       const currentDirection = paths[i].step % this.directions.length;
+    //       const { path, step } =
+    //         distanceBetweenEnds[currentDirection][paths[i].path];
+    //       console.log("Adding value to path", path, step);
+    //       paths[i] = { path, step: paths[i].step + step };
+    //     }
+    //     console.log("Got new path value", paths[i]);
+    //     if (paths[i].step > maxSteps) {
+    //       console.log("Overshot the max value... setting new value");
+    //       allMax = false;
+    //       maxSteps = paths[i].step;
+    //     }
+    //   }
+    //   console.log("Got new paths", paths, "and max", maxSteps);
+    //   count++;
+    // }
+    return 0;
   }
 }
 
