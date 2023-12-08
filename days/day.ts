@@ -11,6 +11,8 @@ type Parts<P1, P2 = P1> = {
   part2: P2;
 };
 
+type DayOutput<P1, P2 = P1> = { dayNumber: number } & Parts<P1, P2>;
+
 export abstract class Day<P1 = number, P2 = P1> {
   testFiles: Parts<string> = {
     part1: "test.txt",
@@ -35,7 +37,15 @@ export abstract class Day<P1 = number, P2 = P1> {
       .split("\n");
   };
 
-  run(dayNumber: number): Parts<P1, P2> {
+  async solvePart1Async(input: string[]): Promise<P1> {
+    return this.solvePart1(input);
+  }
+
+  async solvePart2Async(input: string[]): Promise<P2> {
+    return this.solvePart2(input);
+  }
+
+  async run(dayNumber: number): Promise<DayOutput<P1, P2>> {
     const part1Input = this.convertInputToString(
       this.solutionFiles.part1,
       dayNumber
@@ -44,13 +54,20 @@ export abstract class Day<P1 = number, P2 = P1> {
       this.solutionFiles.part2,
       dayNumber
     );
+    const [part1, part2] = await Promise.all([
+      this.solvePart1Async(part1Input),
+      this.solvePart2Async(part2Input),
+    ]);
     return {
-      part1: this.solvePart1(part1Input),
-      part2: this.solvePart2(part2Input),
+      dayNumber,
+      part1,
+      part2,
     };
   }
 
-  test(dayNumber: number): Parts<TestResult<P1>, TestResult<P2>> {
+  async test(
+    dayNumber: number
+  ): Promise<DayOutput<TestResult<P1>, TestResult<P2>>> {
     const part1Input = this.convertInputToString(
       this.testFiles.part1,
       dayNumber
@@ -59,9 +76,12 @@ export abstract class Day<P1 = number, P2 = P1> {
       this.testFiles.part2,
       dayNumber
     );
-    const part1Value = this.solvePart1(part1Input);
-    const part2Value = this.solvePart2(part2Input);
+    const [part1Value, part2Value] = await Promise.all([
+      this.solvePart1Async(part1Input),
+      this.solvePart2Async(part2Input),
+    ]);
     return {
+      dayNumber,
       part1: {
         passed: part1Value === this.expectedTestValues.part1,
         value: part1Value,
