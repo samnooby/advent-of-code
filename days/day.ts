@@ -25,8 +25,8 @@ export abstract class Day<P1 = number, P2 = P1> {
   };
 
   abstract expectedTestValues: Parts<P1, P2>;
-  abstract solvePart1(input: string[]): P1;
-  abstract solvePart2(input: string[]): P2;
+  abstract solvePart1(input: string[]): P1 | Promise<P1>;
+  abstract solvePart2(input: string[]): P2 | Promise<P2>;
 
   private convertInputToString = (
     file: string,
@@ -38,11 +38,11 @@ export abstract class Day<P1 = number, P2 = P1> {
   };
 
   async solvePart1Async(input: string[]): Promise<P1> {
-    return this.solvePart1(input);
+    return Promise.resolve(this.solvePart1(input));
   }
 
   async solvePart2Async(input: string[]): Promise<P2> {
-    return this.solvePart2(input);
+    return Promise.resolve(this.solvePart2(input));
   }
 
   async run(dayNumber: number): Promise<DayOutput<P1, P2>> {
