@@ -119,7 +119,7 @@ class Day10Solution extends Day {
     }, []);
   }
 
-  private replaceStartWithPipe(input: string[][], validStarts: Point[]): Pipe {
+  private replaceStartWithPipe(validStarts: Point[]): Pipe {
     const [path1, path2] = validStarts;
     if (path1.y === path2.y) Pipe.LEFTRIGHT;
     else if (path1.x > path2.x) {
@@ -161,20 +161,17 @@ class Day10Solution extends Day {
   pipeMap: string[][] = [];
 
   solvePart2(input: string[]): number {
-    // Find the starting point
+    // Create the map without the extra pipes and replace the start with working pipe
     let y = input.findIndex((v) => v.includes(Pipe.START));
     let x = input[y].indexOf(Pipe.START);
     const start: Point = { x, y };
-
     const validStarts = this.findStart(start, input);
     this.firstMap = this.getPathMap(start, validStarts[0], input);
+    this.firstMap[start.y][start.x] = this.replaceStartWithPipe(validStarts);
 
-    this.firstMap[start.y][start.x] = this.replaceStartWithPipe(
-      this.firstMap,
-      validStarts
-    );
+    // Expand the map with extra air spaces, expanding leftright and updown pipes
     this.pipeMap = this.breathMap(this.firstMap);
-    // Replace all '.' with 'I' if inside the cycle or '0' if outside the cycle
+    // While there is still '.' in the map, check if they are inside the cycle
     y = this.pipeMap.findIndex((v) => v.includes("."));
     x = this.pipeMap[y]?.indexOf(".") ?? -1;
     while (x !== -1 && y !== -1) {
@@ -183,7 +180,7 @@ class Day10Solution extends Day {
       x = this.pipeMap[y]?.indexOf(".") ?? -1;
     }
 
-    // Go through each '.' on the first map and check if it is inside the cylce with the pipe map
+    // Map all the '.' on the original map to the new pipe map and count how many are within the cycle
     let total = 0;
     for (let i = 0; i < this.firstMap.length; i++) {
       for (let j = 0; j < this.firstMap[i].length; j++) {
