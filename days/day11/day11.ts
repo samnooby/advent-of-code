@@ -41,36 +41,13 @@ class Day11Solution extends Day {
     }, []);
   }
 
-  solvePart1(input: string[]): number {
-    const [emptyRows, emptyColumns] = this.getEmptyRowsAndColumns(input);
-    const stars = this.getStars(input);
-
-    let total = 0;
-    stars.forEach(({ x, y }, i) => {
-      stars.slice(i + 1).forEach(({ x: x2, y: y2 }) => {
-        const left = x > x2 ? x2 : x;
-        const right = x > x2 ? x : x2;
-        const doubledRows = emptyRows.filter((r) => r > y && r < y2);
-        const doubledColumns = emptyColumns.filter(
-          (c) => c > left && c < right
-        );
-        if (right - left < 0) throw Error("Small x");
-        if (y2 - y < 0) throw Error("Small y");
-
-        total +=
-          right - left + y2 - y + doubledRows.length + doubledColumns.length;
-      });
-    });
-
-    return total;
-  }
-
-  solvePart2(input: string[], isTest: boolean): number {
-    const [emptyRows, emptyColumns] = this.getEmptyRowsAndColumns(input);
-    const stars = this.getStars(input);
-
-    const ROW_MULITPLIER = isTest ? 100 : 1000000;
-    const COLUMN_MULITPLIER = isTest ? 100 : 1000000;
+  private getTotalDistances(
+    stars: Point[],
+    emptyRows: number[],
+    emptyColumns: number[],
+    rowMultiplier: number = 2,
+    columnMulitplier: number = 2
+  ): number {
     let total = 0;
     stars.forEach(({ x, y }, i) => {
       stars.slice(i + 1).forEach(({ x: x2, y: y2 }) => {
@@ -86,12 +63,34 @@ class Day11Solution extends Day {
           left +
           y2 -
           y +
-          doubledRows.length * (ROW_MULITPLIER - 1) +
-          doubledColumns.length * (COLUMN_MULITPLIER - 1);
+          doubledRows.length * (rowMultiplier - 1) +
+          doubledColumns.length * (columnMulitplier - 1);
       });
     });
 
     return total;
+  }
+
+  solvePart1(input: string[]): number {
+    const [emptyRows, emptyColumns] = this.getEmptyRowsAndColumns(input);
+    const stars = this.getStars(input);
+
+    return this.getTotalDistances(stars, emptyRows, emptyColumns);
+  }
+
+  solvePart2(input: string[], isTest: boolean): number {
+    const [emptyRows, emptyColumns] = this.getEmptyRowsAndColumns(input);
+    const stars = this.getStars(input);
+
+    const ROW_MULITPLIER = isTest ? 100 : 1000000;
+    const COLUMN_MULITPLIER = isTest ? 100 : 1000000;
+    return this.getTotalDistances(
+      stars,
+      emptyRows,
+      emptyColumns,
+      ROW_MULITPLIER,
+      COLUMN_MULITPLIER
+    );
   }
 }
 
