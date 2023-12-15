@@ -25,8 +25,8 @@ export abstract class Day<P1 = number, P2 = P1> {
   };
 
   abstract expectedTestValues: Parts<P1, P2>;
-  abstract solvePart1(input: string[]): P1 | Promise<P1>;
-  abstract solvePart2(input: string[]): P2 | Promise<P2>;
+  abstract solvePart1(input: string[], isTest?: boolean): P1 | Promise<P1>;
+  abstract solvePart2(input: string[], isTest?: boolean): P2 | Promise<P2>;
 
   private convertInputToString = (
     file: string,
@@ -37,12 +37,12 @@ export abstract class Day<P1 = number, P2 = P1> {
       .split("\n");
   };
 
-  async solvePart1Async(input: string[]): Promise<P1> {
-    return Promise.resolve(this.solvePart1(input));
+  async solvePart1Async(input: string[], isTest?: boolean): Promise<P1> {
+    return Promise.resolve(this.solvePart1(input, isTest));
   }
 
-  async solvePart2Async(input: string[]): Promise<P2> {
-    return Promise.resolve(this.solvePart2(input));
+  async solvePart2Async(input: string[], isTest?: boolean): Promise<P2> {
+    return Promise.resolve(this.solvePart2(input, isTest));
   }
 
   async run(dayNumber: number): Promise<DayOutput<P1, P2>> {
@@ -55,8 +55,8 @@ export abstract class Day<P1 = number, P2 = P1> {
       dayNumber
     );
     const [part1, part2] = await Promise.all([
-      this.solvePart1Async(part1Input),
-      this.solvePart2Async(part2Input),
+      this.solvePart1Async(part1Input, false),
+      this.solvePart2Async(part2Input, false),
     ]);
     return {
       dayNumber,
@@ -77,8 +77,8 @@ export abstract class Day<P1 = number, P2 = P1> {
       dayNumber
     );
     const [part1Value, part2Value] = await Promise.all([
-      this.solvePart1Async(part1Input),
-      this.solvePart2Async(part2Input),
+      this.solvePart1Async(part1Input, true),
+      this.solvePart2Async(part2Input, true),
     ]);
     return {
       dayNumber,
