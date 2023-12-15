@@ -35,7 +35,7 @@ const makeFileIfNotExists = (fileName: string, data: string = "") => {
  * @param dayNumber - The number of the day to create.
  * @returns The imported module for the created day.
  */
-export const createDay = (dayNumber: number): Day<any, any> => {
+export const createDay = (dayNumber: number): string => {
   const dirName = `./days/day${dayNumber}`;
   if (!existsSync(dirName)) {
     mkdirSync(dirName);
@@ -47,5 +47,5 @@ export const createDay = (dayNumber: number): Day<any, any> => {
   );
   makeFileIfNotExists(`${dirName}/input.txt`);
   makeFileIfNotExists(`${dirName}/test.txt`);
-  return require(`./day${dayNumber}/day${dayNumber}.ts`);
+  return `./day${dayNumber}/day${dayNumber}.ts`;
 };

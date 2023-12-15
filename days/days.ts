@@ -2,6 +2,7 @@ import { Day } from "./day";
 import { readdirSync } from "fs";
 import { createDay } from "./dayCreator";
 import { createInterface } from "readline/promises";
+import { settings } from "../settings";
 
 /**
  * Imports all day files that follow the pattern './days/day${dayNumber}/day${dayNumber}.ts'
@@ -9,27 +10,24 @@ import { createInterface } from "readline/promises";
  *
  * @returns An object containing all imported day files, with dayNumber as the key.
  */
-const getDays = (): { [key: number]: Day<any, any> } => {
+const getDays = (): { [key: number]: string } => {
   const regex = /^day(\d+).ts$/;
   const files = readdirSync("./days", { recursive: true, withFileTypes: true });
-  const foundDays: { [key: number]: Day<any, any> } = files.reduce(
-    (prev, file) => {
-      const dayNumber = regex.exec(file.name)?.at(1);
-      if (!dayNumber || file.path !== `days/day${dayNumber}`) {
-        return prev;
-      }
-      const day: Day<any, any> = require(`${file.path.replace("days/", "./")}/${
-        file.name
-      }`);
-      return { ...prev, [+dayNumber]: day };
-    },
-    {}
-  );
+  const foundDays: { [key: number]: string } = files.reduce((prev, file) => {
+    const dayNumber = regex.exec(file.name)?.at(1);
+    if (!dayNumber || file.path !== `days/day${dayNumber}`) {
+      return prev;
+    }
+    return {
+      ...prev,
+      [+dayNumber]: `${file.path.replace("days/", "./")}/${file.name}`,
+    };
+  }, {});
 
   return foundDays;
 };
 
-const days: { [key: number]: Day<any, any> } = getDays();
+const days: { [key: number]: string } = getDays();
 //If the current date is between December 1 and December 25, and the day doesn't already exist, create it
 const month = new Date().getMonth();
 const date = new Date().getDate();
@@ -87,22 +85,35 @@ export const getDayFromUserInput = (
       )}\nEnter day you want to ${label}: `
     )
     .then((answer) => {
-      if (!answer) {
-        const latestDay = Math.max(...dayNumbers);
-        return { [latestDay]: days[latestDay] };
-      }
-      if (!isNaN(+answer)) {
-        if (!(+answer in days)) {
-          console.error(`Day ${answer} does not exist`);
-          return {};
-        }
-        return { [+answer]: days[+answer] };
-      }
       if (["a", "all"].includes(answer.toLowerCase())) {
-        return days;
+        return Object.entries(days).reduce((prev, [key, value]) => {
+          const day = require(value);
+          return { ...prev, [+key]: day };
+        }, {});
       }
-      console.error("Invalid input");
-      return {};
+      // Set dayInput to default
+      let dayInput: number =
+        settings.defaultDay === "L"
+          ? Math.max(...dayNumbers)
+          : settings.defaultDay;
+      if (answer) {
+        if (isNaN(+answer))
+          console.log(
+            "\x1B[31m%s\x1B[0m",
+            `\nInvalid input: ${answer}, using default`
+          );
+        else dayInput = +answer;
+      }
+      if (!(dayInput in days)) {
+        console.error(
+          "\x1B[31m%s\x1B[0m",
+          "\x1B[31%s\x1B[34m",
+          `\nDay ${answer} does not exist`
+        );
+        return {};
+      }
+      const day = require(days[dayInput]);
+      return { [dayInput]: day };
     })
     .finally(() => rl.close());
 };
