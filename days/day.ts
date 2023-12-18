@@ -4,6 +4,12 @@ export type TestResult<R> = {
   passed: Boolean;
   value: R;
   expected: R;
+  runtime: string;
+};
+
+export type RunResult<R> = {
+  value: R;
+  runtime: string;
 };
 
 type Parts<P1, P2 = P1> = {
@@ -45,7 +51,9 @@ export abstract class Day<P1 = number, P2 = P1> {
     return Promise.resolve(this.solvePart2(input, isTest));
   }
 
-  async run(dayNumber: number): Promise<DayOutput<P1, P2>> {
+  async run(
+    dayNumber: number
+  ): Promise<DayOutput<RunResult<P1>, RunResult<P2>>> {
     const part1Input = this.convertInputToString(
       this.solutionFiles.part1,
       dayNumber
@@ -54,14 +62,22 @@ export abstract class Day<P1 = number, P2 = P1> {
       this.solutionFiles.part2,
       dayNumber
     );
-    const [part1, part2] = await Promise.all([
-      this.solvePart1Async(part1Input, false),
-      this.solvePart2Async(part2Input, false),
-    ]);
+    const p1Start = performance.now();
+    const part1Value = await this.solvePart1Async(part1Input, false);
+    const p1End = performance.now();
+    const p2Start = performance.now();
+    const part2Value = await this.solvePart2Async(part2Input, false);
+    const p2End = performance.now();
     return {
       dayNumber,
-      part1,
-      part2,
+      part1: {
+        value: part1Value,
+        runtime: `${Math.round((p1End - p1Start) * 1000) / 1000}ms`,
+      },
+      part2: {
+        value: part2Value,
+        runtime: `${Math.round((p2End - p2Start) * 1000) / 1000}ms`,
+      },
     };
   }
 
@@ -76,21 +92,25 @@ export abstract class Day<P1 = number, P2 = P1> {
       this.testFiles.part2,
       dayNumber
     );
-    const [part1Value, part2Value] = await Promise.all([
-      this.solvePart1Async(part1Input, true),
-      this.solvePart2Async(part2Input, true),
-    ]);
+    const p1Start = performance.now();
+    const part1Value = await this.solvePart1Async(part1Input, true);
+    const p1End = performance.now();
+    const p2Start = performance.now();
+    const part2Value = await this.solvePart2Async(part2Input, true);
+    const p2End = performance.now();
     return {
       dayNumber,
       part1: {
         passed: part1Value === this.expectedTestValues.part1,
         value: part1Value,
         expected: this.expectedTestValues.part1,
+        runtime: `${Math.round((p1End - p1Start) * 1000) / 1000}ms`,
       },
       part2: {
         passed: part2Value === this.expectedTestValues.part2,
         value: part2Value,
         expected: this.expectedTestValues.part2,
+        runtime: `${Math.round((p2End - p2Start) * 1000) / 1000}ms`,
       },
     };
   }
