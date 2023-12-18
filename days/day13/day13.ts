@@ -1,7 +1,16 @@
 import { Day } from "../day";
 
+type MatchingRow = {
+  value: number;
+  isDifferent: boolean;
+};
+
+type MatchingRows = {
+  [key: number]: MatchingRow[];
+};
+
 class Day13Solution extends Day {
-  expectedTestValues = { part1: 405, part2: 0 };
+  expectedTestValues = { part1: 405, part2: 400 };
 
   private getPatterns(input: string[]): string[][] {
     return input.reduce(
@@ -47,7 +56,7 @@ class Day13Solution extends Day {
         bottom + Math.ceil(difference),
         bottom + Math.ceil(difference) + 1,
       ];
-      for (let i = 0; i < difference; i++) {
+      for (let i = 0; i < difference + 1; i++) {
         if (!rows[bottom + i].includes(top - i)) {
           flip = null;
           break;
@@ -71,22 +80,86 @@ class Day13Solution extends Day {
       if (reflectedColumns) return p + reflectedColumns[0];
       throw new Error(`No reflection found \n ${c.join("\n")}`);
     }, 0);
-    const rows = patterns.map((c) => {
-      const reflectedRows = this.findReflection(c);
-      if (reflectedRows) return [reflectedRows, reflectedRows[0] * 100];
+    return total;
+  }
+
+  private findMatchingRows(pattern: string[]): MatchingRows {
+    const matchingRows: MatchingRows = {};
+    // Compare each row to each other row
+    for (let i = 0; i < pattern.length; i++) {
+      matchingRows[i] = [];
+      for (let ii = 0; ii < pattern.length; ii++) {
+        // If there is 0 or one difference in the row, add it to the list of matching rows
+        if (i !== ii) {
+          let mistakes = 0;
+          for (let iii = 0; iii < pattern[0].length; iii++) {
+            if (pattern[i][iii] !== pattern[ii][iii]) {
+              mistakes++;
+              if (mistakes > 1) break;
+            }
+          }
+          if (mistakes <= 1) {
+            matchingRows[i] = [
+              ...matchingRows[i],
+              { value: ii, isDifferent: mistakes === 1 },
+            ];
+          }
+        }
+      }
+    }
+    return matchingRows;
+  }
+
+  private findReflectionWithMistakes(
+    matches: MatchingRows
+  ): [number, number] | null {
+    let flip: [number, number] | null = null;
+    for (const row of [0, Object.keys(matches).length - 1]) {
+      // Check the first and last row (They are needed for reflection)
+      for (const match of matches[row]) {
+        // Go through each match the row has and see if the rows between them are also matches
+        let mistakes = match.isDifferent ? 1 : 0;
+        const bottom = Math.min(row, match.value);
+        const top = Math.max(row, match.value);
+        const difference = (top - bottom) / 2;
+        flip = [
+          bottom + Math.ceil(difference),
+          bottom + Math.ceil(difference) + 1,
+        ];
+        for (let i = 1; i < difference + 1; i++) {
+          // If the row is different, add it to the mistakes. Once there are more than 1 mistakes, it is not a valid reflection
+          let match = matches[bottom + i].find((m) => m.value === top - i);
+          if (match?.isDifferent === true && bottom + i < top - i) mistakes++;
+          if (!match || mistakes > 1) {
+            flip = null;
+            break;
+          }
+        }
+        // If there are not mistakes then it is not a different reflection and not valid
+        if (mistakes === 0) flip = null;
+        if (flip !== null) return flip;
+      }
+    }
+    return flip;
+  }
+
+  solvePart2(input: string[]): number {
+    const patterns = this.getPatterns(input);
+    const total = patterns.reduce((p, c) => {
+      const matches = this.findMatchingRows(c);
+      const reflectedRows = this.findReflectionWithMistakes(matches);
+      if (reflectedRows) return p + reflectedRows[0] * 100;
       const flippedPattern: string[] = [];
       for (let i = 0; i < c[0].length; i++) {
         flippedPattern.push(c.map((row) => row[i]).join(""));
       }
-      const reflectedColumns = this.findReflection(flippedPattern);
-      if (reflectedColumns) return [reflectedColumns, reflectedColumns[0]];
-    });
-    console.log(rows.map((p) => `${p![0]} - ${p![1]}`).join("\n"));
+      const columnMatches = this.findMatchingRows(flippedPattern);
+      const reflectedColumns = this.findReflectionWithMistakes(columnMatches);
+      if (reflectedColumns) return p + reflectedColumns[0];
+      return p;
+      // throw new Error(`No reflection found \n${c.join("\n")}`);
+    }, 0);
     return total;
-  }
-
-  solvePart2(input: string[]): number {
-    return 1;
   }
 }
 
